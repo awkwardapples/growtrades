@@ -1,9 +1,5 @@
 'use client';
 
-/**
- * ScrollExpansionHero — scroll-synced cinematic video reveal.
- */
-
 import {
   useEffect,
   useRef,
@@ -89,13 +85,16 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
 
       const video = videoRef.current;
 
-      // ✅ FIX: safer duration check for mobile Safari
+      // ✅ Safe scrub control (mobile-safe)
       if (video && Number.isFinite(video.duration) && video.duration > 0) {
         const targetTime = rawProgress * video.duration;
 
         if (Math.abs(video.currentTime - targetTime) > 0.016) {
           video.currentTime = targetTime;
         }
+
+        // 🔒 HARD LOCK: prevent any browser playback interference
+        video.pause();
       }
 
       cancelAnimationFrame(rafRef.current);
@@ -142,18 +141,17 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
   const easeDeep = easeOutCubic(Math.min(p * 1.3, 1));
 
   const viewW = typeof window !== 'undefined' ? window.innerWidth : 1440;
-  const viewH = typeof window !== 'undefined' ? window.innerHeight : 900;
-
   const minW = isMobile ? 280 : 380;
   const minH = isMobile ? 320 : 460;
 
   const mediaWidth = lerp(minW, viewW, ease);
-  const mediaHeight = lerp(minH, viewH, ease);
+  const mediaHeight = lerp(minH, viewW, ease);
   const borderRad = lerp(20, 0, easeDeep);
 
   const textOpacity = Math.max(0, 1 - p * 2.2);
   const textScale = 1 - p * 0.04;
   const bgOpacity = Math.max(0, 1 - ease * 1.6);
+
   const overlayOpacity = lerp(0.25, 0, easeOutCubic(Math.min(p * 1.4, 1)));
 
   return (
@@ -188,7 +186,7 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
         </div>
 
         <div className="relative flex flex-col items-center w-full min-h-[100dvh]">
-          {/* Video */}
+          {/* Video container */}
           <div
             className="absolute top-1/2 left-1/2 z-10"
             style={{
@@ -208,9 +206,7 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
               src={videoSrc}
               poster={posterSrc}
               muted
-              autoPlay
               playsInline
-              loop
               preload="metadata"
               disablePictureInPicture
               className="w-full h-full object-cover"
@@ -222,9 +218,11 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
               onCanPlay={() => {
                 setVideoReady(true);
 
-                // ✅ FIX: force first frame on mobile Safari
                 const video = videoRef.current;
-                if (video && video.currentTime === 0) {
+
+                // 🔒 ensure no autoplay state ever kicks in
+                if (video) {
+                  video.pause();
                   video.currentTime = 0.01;
                 }
               }}
@@ -240,7 +238,7 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
             )}
           </div>
 
-          {/* Text */}
+          {/* Text layer */}
           <div
             className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none"
             style={{
