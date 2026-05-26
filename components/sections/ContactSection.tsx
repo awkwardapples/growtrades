@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { fadeUp, slideInRight, staggerContainer, viewportConfig } from '@/lib/motion';
 import { Button } from '@/components/ui/button';
 import { CONTACT } from '@/data/content';
-import { Mail, Phone, MapPin, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, MapPin, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -130,7 +130,6 @@ export default function ContactSection() {
             <motion.ul variants={staggerContainer} className="space-y-4" role="list">
               {[
                 { Icon: Mail, label: CONTACT.email, href: `mailto:${CONTACT.email}` },
-                { Icon: Phone, label: CONTACT.phone, href: `tel:${CONTACT.phone.replace(/\s/g, '')}` },
                 { Icon: MapPin, label: CONTACT.location, href: undefined },
               ].map(({ Icon, label, href }) => (
                 <motion.li key={label} variants={fadeUp} className="flex items-center gap-4">

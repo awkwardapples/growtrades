@@ -31,7 +31,7 @@ export default function Navbar() {
           <img
             src={HERO_CONTENT.companyLogo}
             alt="GrowTrades"
-            className="h-8 w-auto"
+            className="h-11 w-auto"
             style={{ display: 'block' }}
           />
         </a>

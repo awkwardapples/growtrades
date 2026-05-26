@@ -70,14 +70,6 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}
-                  className="text-sm text-[#777] hover:text-[#111] transition-colors cursor-pointer"
-                >
-                  {CONTACT.phone}
-                </a>
-              </li>
-              <li>
                 <span className="text-sm text-[#aaa]">{CONTACT.location}</span>
               </li>
             </ul>

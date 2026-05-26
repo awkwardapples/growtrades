@@ -15,7 +15,7 @@ import {
 
 export const HERO_CONTENT = {
   // Logo image displayed in Navbar. Place file at public/images/growtrades-logo.png.
-  companyLogo: '/images/GrowTrades-Logo-Transparent-Background.png',
+  companyLogo: '/images/growtrades-logo-transparent-background.png',
   eyebrow: '',
   headline: 'Grow your trades business',
   headlineAccent: '',
@@ -24,12 +24,12 @@ export const HERO_CONTENT = {
   cta: 'Book a Free Consultation',
   ctaSecondary: 'How It Works',
   scrollPrompt: 'Scroll to explore',
-  videoSrc: '/Videos/No-watermark-grow-trades-vid.mp4',
+  videoSrc: '/Videos/no-watermark-grow-trades-vid.mp4',
   videoPoster:
     'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920&q=80',
   // Full-screen cinematic background behind the hero video.
   // Place image at public/images/hero-bg.jpg — high-res, real tradespeople/site photography.
-  heroBackgroundImage: '/images/pexels-life-of-pix-8092.jpg',
+  heroBackgroundImage: '/images/hero-background.jpg',
 };
 
 export const TRADES_LIST = [
@@ -286,7 +286,6 @@ export const NAV_LINKS = [
 ];
 
 export const CONTACT = {
-  email: 'info@growtrades.org',
-  phone: '0800 000 0000',
+  email: 'sales@growtrades.org',
   location: 'Serving trades businesses across the UK',
 };

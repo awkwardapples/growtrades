@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
   try {
     await resend.emails.send({
       from: 'GrowTrades Website <noreply@growtrades.org>',
-      to: ['info@growtrades.org'],
+      to: ['sales@growtrades.org'],
       replyTo: email,
       subject: `New enquiry — ${name} (${trade})`,
       html: `
