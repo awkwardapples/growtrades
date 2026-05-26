@@ -183,7 +183,9 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
   const overlayOpacity = lerp(0.25, 0, easeOutCubic(Math.min(p * 1.4, 1)));
 
   return (
-    <div className="relative overflow-x-hidden">
+    // z-index: 10 ensures the hero stacking context sits above all subsequent page sections,
+    // preventing the trades slider and other sections from bleeding through during expansion.
+    <div className="relative overflow-x-hidden" style={{ position: 'relative', zIndex: 10 }}>
       <section
         className="relative flex flex-col items-center justify-start min-h-[100dvh]"
         style={{ background: '#F7F6F4' }}
@@ -202,10 +204,14 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
                 src={backgroundImageSrc}
                 alt=""
                 className="w-full h-full object-cover"
-                style={{ filter: `blur(${lerp(0, 12, ease)}px)` }}
+                style={{ filter: `blur(${lerp(0, 8, ease)}px)` }}
               />
-              {/* Lighten dark photos so dark text stays readable */}
-              <div className="absolute inset-0 bg-white/70" />
+              {/* Overlay starts light so the cinematic image shows through,
+                  then brightens as the video expands to merge into the white page */}
+              <div
+                className="absolute inset-0"
+                style={{ background: `rgba(247,246,244,${lerp(0.42, 0.88, ease)})` }}
+              />
             </>
           ) : (
             /* Clean grid on plain background */
@@ -285,25 +291,20 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
               willChange: 'opacity, transform',
             }}
           >
-            {/* Eyebrow */}
-            {eyebrow && textOpacity > 0.01 && (
-              <p className="text-xs font-medium tracking-[0.2em] uppercase text-blue-700 mb-5">
-                {eyebrow}
-              </p>
-            )}
-
-            {/* Headline — split words fly apart on scroll */}
+            {/* Single headline — no eyebrow, no accent split */}
             {textOpacity > 0.01 && (
-              <div className="flex flex-col items-center gap-0.5 text-center px-6">
+              <div className="flex flex-col items-center text-center px-6">
                 <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111111] leading-tight tracking-tight">
                   {headline}
                 </span>
-                <span
-                  className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight"
-                  style={{ color: '#1D4ED8' }}
-                >
-                  {headlineAccent}
-                </span>
+                {headlineAccent && (
+                  <span
+                    className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight"
+                    style={{ color: '#1D4ED8' }}
+                  >
+                    {headlineAccent}
+                  </span>
+                )}
               </div>
             )}
 

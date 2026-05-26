@@ -1,15 +1,13 @@
 import type { NextConfig } from 'next';
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-
+// NOTE: output: 'export' (GitHub Pages static mode) has been removed.
+// The contact form API route requires a Node.js server runtime (Resend calls happen server-side).
+// Deploy to Vercel (free): connect your GitHub repo at vercel.com — it auto-detects Next.js.
+// If you must keep GitHub Pages, replace the API route with a Formspree endpoint instead.
 const nextConfig: NextConfig = {
-  output: 'export',
-  basePath,
-  assetPrefix: basePath || undefined,
   images: {
     unoptimized: true,
   },
-  trailingSlash: true,
 };
 
 export default nextConfig;

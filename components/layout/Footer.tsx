@@ -86,18 +86,10 @@ export default function Footer() {
 
         <Separator className="bg-black/[0.06] mb-6" />
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center justify-center">
           <p className="text-xs text-[#bbb]">
             © {year} GrowTrades Ltd. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="text-xs text-[#bbb] hover:text-[#555] transition-colors cursor-pointer">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-xs text-[#bbb] hover:text-[#555] transition-colors cursor-pointer">
-              Terms of Service
-            </a>
-          </div>
         </div>
       </div>
     </footer>

@@ -14,21 +14,22 @@ import {
 } from 'lucide-react';
 
 export const HERO_CONTENT = {
-  eyebrow: 'Growth Systems for UK Trades',
-  headline: 'Your Trades Business.',
-  headlineAccent: 'Optimised.',
+  // Logo image displayed in Navbar. Place file at public/images/growtrades-logo.png.
+  companyLogo: '/images/GrowTrades-Logo-Transparent-Background.png',
+  eyebrow: '',
+  headline: 'Grow your trades business',
+  headlineAccent: '',
   subheadline:
     'From manual quoting and missed leads to a reliable, automated growth operation. GrowTrades builds the systems that turn a local trade into a scalable business.',
   cta: 'Book a Free Consultation',
   ctaSecondary: 'How It Works',
   scrollPrompt: 'Scroll to explore',
-  videoSrc: '/Videos/Grow-trades-website-animation.mp4',
+  videoSrc: '/Videos/No-watermark-grow-trades-vid.mp4',
   videoPoster:
     'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920&q=80',
-  // Replace with a local or CDN image for the hero background.
-  // File should be placed at public/images/hero-bg.jpg (or similar).
-  // For a light theme, use a bright image or leave as empty string.
-  heroBackgroundImage: '',
+  // Full-screen cinematic background behind the hero video.
+  // Place image at public/images/hero-bg.jpg — high-res, real tradespeople/site photography.
+  heroBackgroundImage: '/images/pexels-life-of-pix-8092.jpg',
 };
 
 export const TRADES_LIST = [
@@ -285,7 +286,7 @@ export const NAV_LINKS = [
 ];
 
 export const CONTACT = {
-  email: 'hello@growtrades.co.uk',
+  email: 'info@growtrades.org',
   phone: '0800 000 0000',
   location: 'Serving trades businesses across the UK',
 };
