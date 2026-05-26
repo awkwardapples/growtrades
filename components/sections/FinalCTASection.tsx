@@ -3,42 +3,33 @@
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer, viewportConfig } from '@/lib/motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function FinalCTASection() {
+  const scrollToContact = () => {
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToHowItWorks = () => {
+    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section
       id="cta"
       className="relative py-32 px-4 overflow-hidden"
       aria-labelledby="cta-heading"
+      style={{ background: '#FFFFFF' }}
     >
-      {/* Background */}
+      <div className="gt-divider max-w-6xl mx-auto mb-20" />
+
+      {/* Subtle grid */}
       <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse 90% 70% at 50% 50%, rgba(59,130,246,0.14) 0%, transparent 70%),
-            radial-gradient(ellipse 60% 40% at 20% 80%, rgba(59,130,246,0.06) 0%, transparent 60%),
-            #080810
-          `,
-        }}
+        className="absolute inset-0 gt-grid-bg pointer-events-none opacity-60"
         aria-hidden="true"
       />
 
-      {/* Grid overlay */}
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)
-          `,
-          backgroundSize: '64px 64px',
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative max-w-4xl mx-auto text-center">
+      <div className="relative max-w-3xl mx-auto text-center">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -48,7 +39,8 @@ export default function FinalCTASection() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase text-blue-400"
+            className="text-xs font-medium tracking-[0.18em] uppercase"
+            style={{ color: '#1D4ED8' }}
           >
             Ready to grow?
           </motion.p>
@@ -56,56 +48,46 @@ export default function FinalCTASection() {
           <motion.h2
             id="cta-heading"
             variants={fadeUp}
-            className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.02] tracking-tight"
+            className="text-5xl sm:text-6xl font-bold text-[#111] leading-[1.04] tracking-tight"
           >
             Stop losing leads.{' '}
-            <br className="hidden sm:block" />
-            <span
-              style={{
-                background:
-                  'linear-gradient(135deg, #3b82f6 0%, #60a5fa 60%, #93c5fd 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Start scaling.
-            </span>
+            <span style={{ color: '#1D4ED8' }}>Start scaling.</span>
           </motion.h2>
 
           <motion.p
             variants={fadeUp}
-            className="text-lg text-white/50 leading-relaxed max-w-xl"
+            className="text-lg text-[#666] leading-relaxed max-w-lg"
           >
-            Book a free 30-minute consultation. We&apos;ll audit your current online presence and show you exactly where growth is being left on the table.
+            Book a free 30-minute call. We&apos;ll review your current online presence and show you exactly where leads are being lost.
           </motion.p>
 
           <motion.div
             variants={fadeUp}
-            className="flex flex-col sm:flex-row items-center gap-3 mt-2"
+            className="flex flex-col sm:flex-row items-center gap-3 mt-1"
           >
             <Button
               size="lg"
-              className="bg-blue-500 hover:bg-blue-400 text-white px-8 py-4 rounded-xl font-medium text-base cursor-pointer transition-colors duration-150"
+              className="bg-[#1D4ED8] hover:bg-[#1e40af] text-white px-8 py-3 rounded-xl font-medium text-sm cursor-pointer transition-colors duration-150"
+              onClick={scrollToContact}
             >
-              <Calendar size={16} className="mr-2" aria-hidden="true" />
-              Book Free Consultation
+              Book free consultation
+              <ArrowRight size={14} className="ml-2" aria-hidden="true" />
             </Button>
             <Button
               size="lg"
               variant="ghost"
-              className="text-white/50 hover:text-white hover:bg-white/5 px-8 py-4 rounded-xl font-medium text-base cursor-pointer transition-colors duration-150"
+              className="text-[#555] hover:text-[#111] hover:bg-black/[0.04] px-8 py-3 rounded-xl font-medium text-sm cursor-pointer transition-colors duration-150"
+              onClick={scrollToHowItWorks}
             >
-              View case studies
-              <ArrowRight size={15} className="ml-2" aria-hidden="true" />
+              See how it works
             </Button>
           </motion.div>
 
           <motion.p
             variants={fadeUp}
-            className="text-xs text-white/25 mt-2"
+            className="text-xs text-[#bbb] mt-1"
           >
-            No commitment required. Results-focused. UK-based.
+            No commitment. UK-based. Responds within one working day.
           </motion.p>
         </motion.div>
       </div>

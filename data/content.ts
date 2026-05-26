@@ -16,17 +16,35 @@ import {
 export const HERO_CONTENT = {
   eyebrow: 'Growth Systems for UK Trades',
   headline: 'Your Trades Business.',
-  headlineAccent: 'Systemised.',
+  headlineAccent: 'Optimised.',
   subheadline:
-    'From manual quoting and missed leads to a complete automated growth operation. GrowTrades builds the systems that turn a local trade into a scalable business.',
+    'From manual quoting and missed leads to a reliable, automated growth operation. GrowTrades builds the systems that turn a local trade into a scalable business.',
   cta: 'Book a Free Consultation',
-  ctaSecondary: 'See How It Works',
+  ctaSecondary: 'How It Works',
   scrollPrompt: 'Scroll to explore',
-  videoSrc:
-    'https://me7aitdbxq.ufs.sh/f/2wsMIGDMQRdYuZ5R8ahEEZ4aQK56LizRdfBSqeDMsmUIrJN1',
+  videoSrc: '/Videos/Grow-trades-website-animation.mp4',
   videoPoster:
     'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920&q=80',
+  // Replace with a local or CDN image for the hero background.
+  // File should be placed at public/images/hero-bg.jpg (or similar).
+  // For a light theme, use a bright image or leave as empty string.
+  heroBackgroundImage: '',
 };
+
+export const TRADES_LIST = [
+  'Plumbing',
+  'Electrical',
+  'Roofing',
+  'Landscaping',
+  'Handyman',
+  'Carpentry',
+  'Welding',
+  'Building',
+  'Plastering',
+  'Tiling',
+  'HVAC',
+  'Fencing',
+];
 
 export const SERVICES = [
   {
@@ -204,11 +222,66 @@ export const WHY_US_POINTS = [
   },
 ];
 
+export const GROWTH_AUDIT = {
+  clientLabel: 'Client example: Midlands Plumbing Co.',
+  period: '6-month engagement',
+  metrics: [
+    {
+      label: 'Google Ranking (avg. target terms)',
+      before: 'Page 4–5',
+      after: 'Top 3',
+      unit: '',
+    },
+    {
+      label: 'Monthly Search Clicks (GSC)',
+      before: '47',
+      after: '318',
+      unit: 'clicks',
+    },
+    {
+      label: 'Monthly Impressions',
+      before: '1,200',
+      after: '9,400',
+      unit: 'impressions',
+    },
+    {
+      label: 'Enquiries per Week',
+      before: '3–4',
+      after: '18–22',
+      unit: 'enquiries',
+    },
+    {
+      label: 'Lead Conversion Rate',
+      before: '11%',
+      after: '36%',
+      unit: '',
+    },
+    {
+      label: 'Manual Quoting Hours / Week',
+      before: '14 hrs',
+      after: '3 hrs',
+      unit: '',
+    },
+    {
+      label: 'Average Job Value',
+      before: '£640',
+      after: '£960',
+      unit: '',
+    },
+    {
+      label: 'Google Review Rating',
+      before: '3.9 ★',
+      after: '4.8 ★',
+      unit: '',
+    },
+  ],
+};
+
 export const NAV_LINKS = [
   { label: 'What We Do', href: '#what-we-do' },
   { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Platform', href: '#platform' },
   { label: 'Results', href: '#results' },
+  { label: 'Contact', href: '#contact' },
 ];
 
 export const CONTACT = {

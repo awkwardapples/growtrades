@@ -40,45 +40,48 @@
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
 
-  /* GrowTrades brand tokens */
-  --color-gt-blue: #3b82f6;
-  --color-gt-blue-dim: rgba(59, 130, 246, 0.12);
-  --color-gt-blue-glow: rgba(59, 130, 246, 0.25);
-  --color-gt-surface: rgba(255, 255, 255, 0.04);
-  --color-gt-border: rgba(255, 255, 255, 0.08);
-  --color-gt-border-bright: rgba(255, 255, 255, 0.14);
-  --color-gt-gold: #d97706;
-  --color-gt-green: #10b981;
+  /* GrowTrades design tokens */
+  --color-gt-ink: #111111;
+  --color-gt-ink-secondary: #555555;
+  --color-gt-ink-muted: #999999;
+  --color-gt-surface: #FFFFFF;
+  --color-gt-surface-2: #F5F4F2;
+  --color-gt-border: rgba(0, 0, 0, 0.07);
+  --color-gt-border-strong: rgba(0, 0, 0, 0.12);
+  --color-gt-blue: #1D4ED8;
+  --color-gt-blue-dim: rgba(29, 78, 216, 0.08);
+  --color-gt-green: #059669;
+  --color-gt-amber: #B45309;
 }
 
 :root {
-  --background: #080810;
-  --foreground: #f0f0f8;
-  --card: #0e0e1c;
-  --card-foreground: #f0f0f8;
-  --popover: #0e0e1c;
-  --popover-foreground: #f0f0f8;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #12121f;
-  --secondary-foreground: #a0a0b0;
-  --muted: #12121f;
-  --muted-foreground: #64647a;
-  --accent: #1a1a2e;
-  --accent-foreground: #f0f0f8;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.08);
-  --ring: rgba(59, 130, 246, 0.5);
+  --background: #F7F6F4;
+  --foreground: #111111;
+  --card: #FFFFFF;
+  --card-foreground: #111111;
+  --popover: #FFFFFF;
+  --popover-foreground: #111111;
+  --primary: #1D4ED8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F3F2F0;
+  --secondary-foreground: #111111;
+  --muted: #F3F2F0;
+  --muted-foreground: #6B6B6B;
+  --accent: #EEF2FF;
+  --accent-foreground: #1D4ED8;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: rgba(0, 0, 0, 0.07);
+  --input: rgba(0, 0, 0, 0.06);
+  --ring: rgba(29, 78, 216, 0.35);
   --radius: 0.75rem;
-  --sidebar: #0e0e1c;
-  --sidebar-foreground: #f0f0f8;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #12121f;
-  --sidebar-accent-foreground: #f0f0f8;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: rgba(59, 130, 246, 0.5);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #111111;
+  --sidebar-primary: #1D4ED8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F3F2F0;
+  --sidebar-accent-foreground: #111111;
+  --sidebar-border: rgba(0, 0, 0, 0.07);
+  --sidebar-ring: rgba(29, 78, 216, 0.35);
 }
 
 @layer base {
@@ -95,73 +98,67 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    background-color: #080810;
+    background-color: #F7F6F4;
+    color: #111111;
     overflow-x: hidden;
   }
 }
 
-/* Grid background pattern */
+/* Subtle grid for light sections */
 .gt-grid-bg {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
-/* Blue glow radial background */
-.gt-glow-bg {
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59, 130, 246, 0.18) 0%, transparent 70%),
-    #080810;
+/* Cards */
+.gt-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 16px;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
 }
 
-/* Glass card */
-.gt-glass {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* Glow accent line */
-.gt-accent-line {
-  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-  height: 1px;
-}
-
-/* Blue text glow */
-.gt-text-glow {
-  text-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
-}
-
-/* Subtle card hover */
-.gt-card-hover {
-  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
-}
-
-.gt-card-hover:hover {
-  border-color: rgba(59, 130, 246, 0.3);
-  background: rgba(59, 130, 246, 0.06);
+.gt-card:hover {
+  border-color: rgba(29, 78, 216, 0.18);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
 }
 
-/* Scroll bar styling */
+/* Section divider */
+.gt-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Blue pill tag */
+.gt-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(29, 78, 216, 0.08);
+  color: #1D4ED8;
+  border: 1px solid rgba(29, 78, 216, 0.15);
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #080810;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.12);
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 /* Reduced motion */
@@ -171,7 +168,6 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-
   html {
     scroll-behavior: auto;
   }

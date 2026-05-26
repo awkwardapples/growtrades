@@ -8,17 +8,16 @@ export default function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="relative py-32 px-4 overflow-hidden"
+      className="relative py-32 px-4"
+      style={{ background: '#FFFFFF' }}
       aria-labelledby="how-it-works-heading"
-      style={{
-        background:
-          'radial-gradient(ellipse 80% 60% at 50% 100%, rgba(59,130,246,0.08) 0%, transparent 70%), #080810',
-      }}
     >
+      <div className="gt-divider max-w-6xl mx-auto mb-20" />
+
       <div className="max-w-6xl mx-auto">
-        {/* Section header */}
+        {/* Header */}
         <motion.div
-          className="mb-20 max-w-xl"
+          className="mb-16 max-w-lg"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -26,40 +25,37 @@ export default function HowItWorksSection() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase text-blue-400 mb-4"
+            className="text-xs font-medium tracking-[0.18em] uppercase mb-4"
+            style={{ color: '#1D4ED8' }}
           >
-            How The System Works
+            How it works
           </motion.p>
           <motion.h2
             id="how-it-works-heading"
             variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tight mb-5"
+            className="text-4xl md:text-5xl font-bold text-[#111] leading-tight tracking-tight mb-4"
           >
-            A complete lead journey.{' '}
-            <span className="text-white/35">Automated.</span>
+            A complete lead journey. Automated.
           </motion.h2>
           <motion.p
             variants={fadeUp}
-            className="text-base text-white/50 leading-relaxed"
+            className="text-base text-[#666] leading-relaxed"
           >
-            Every step from first search to completed job is handled, tracked, and optimised. No manual chasing. No missed leads.
+            From the moment a customer searches online to a completed and reviewed job — every step handled.
           </motion.p>
         </motion.div>
 
         {/* Steps */}
         <div className="relative">
-          {/* Vertical connector line (desktop) */}
+          {/* Vertical line connector (desktop) */}
           <div
-            className="absolute left-[39px] top-12 bottom-12 w-px hidden lg:block"
-            style={{
-              background:
-                'linear-gradient(to bottom, transparent, rgba(59,130,246,0.3), rgba(59,130,246,0.3), transparent)',
-            }}
+            className="absolute left-[39px] top-14 bottom-14 w-px hidden lg:block"
+            style={{ background: 'linear-gradient(to bottom, transparent, rgba(29,78,216,0.15), rgba(29,78,216,0.15), transparent)' }}
             aria-hidden="true"
           />
 
           <motion.div
-            className="flex flex-col gap-12"
+            className="flex flex-col gap-10"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -71,49 +67,50 @@ export default function HowItWorksSection() {
                 variants={slideInLeft}
                 className="relative flex gap-6 lg:gap-10 items-start"
               >
-                {/* Step number */}
+                {/* Step badge */}
                 <div
                   className="relative z-10 flex-shrink-0 w-20 h-20 rounded-2xl flex flex-col items-center justify-center"
                   style={{
-                    background: 'rgba(59,130,246,0.1)',
-                    border: '1px solid rgba(59,130,246,0.25)',
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(29,78,216,0.15)',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
                   }}
                 >
-                  <span className="text-[10px] font-bold tracking-[0.15em] text-blue-400/60 uppercase">
+                  <span
+                    className="text-[9px] font-bold tracking-[0.15em] uppercase mb-0.5"
+                    style={{ color: 'rgba(29,78,216,0.4)' }}
+                  >
                     Step
                   </span>
-                  <span className="text-2xl font-bold text-blue-400 leading-none">
+                  <span className="text-2xl font-bold leading-none" style={{ color: '#1D4ED8' }}>
                     {step.number}
                   </span>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 pt-2">
-                  <h3 className="text-xl font-semibold text-white mb-2 leading-tight">
+                <div className="flex-1 pt-3">
+                  <h3 className="text-lg font-semibold text-[#111] mb-1.5 leading-tight">
                     {step.title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed mb-3 max-w-lg">
+                  <p className="text-sm text-[#666] leading-relaxed mb-3 max-w-lg">
                     {step.description}
                   </p>
                   <div
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/35 font-medium"
+                    className="inline-flex text-xs text-[#888] px-3 py-1.5 rounded-lg"
                     style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.07)',
+                      background: '#F5F4F2',
+                      border: '1px solid rgba(0,0,0,0.06)',
                     }}
                   >
                     {step.detail}
                   </div>
                 </div>
 
-                {/* Connecting line segment between steps (mobile) */}
+                {/* Mobile connector */}
                 {i < HOW_IT_WORKS_STEPS.length - 1 && (
                   <div
-                    className="absolute left-[39px] top-20 h-12 w-px lg:hidden"
-                    style={{
-                      background:
-                        'linear-gradient(to bottom, rgba(59,130,246,0.3), transparent)',
-                    }}
+                    className="absolute left-[39px] top-20 h-10 w-px lg:hidden"
+                    style={{ background: 'linear-gradient(to bottom, rgba(29,78,216,0.15), transparent)' }}
                     aria-hidden="true"
                   />
                 )}

@@ -1,5 +1,28 @@
 'use client';
 
+/**
+ * ScrollExpansionHero — scroll-synced cinematic video reveal.
+ *
+ * VIDEO SCRUBBING NOTE:
+ * For smooth scrubbing, the source video should be exported at:
+ * - High frame rate (30–60fps recommended)
+ * - H.264 or VP9 codec
+ * - Keyframe interval every 1–2 seconds (not just scene changes)
+ * - Duration: 6–15 seconds is ideal for a full scroll journey
+ * A very short video (<3s) will feel jumpy regardless of scrubbing logic.
+ *
+ * Architecture:
+ * - targetRef: raw scroll progress (set immediately, no re-render)
+ * - displayRef: lerped progress for smooth CSS transitions (drives React state)
+ * - videoRef: currentTime is set from targetRef directly (no lerp — instant)
+ * - One RAF loop runs while the user is actively scrolling
+ *
+ * Z-index layers (text always above video):
+ * - z-0  : background (image or gradient)
+ * - z-10 : video container (expands outward)
+ * - z-30 : text overlay (always on top, fades out as video expands)
+ */
+
 import {
   useEffect,
   useRef,
@@ -15,80 +38,114 @@ import { easeOutCubic, lerp } from '@/lib/motion';
 interface ScrollExpansionHeroProps {
   videoSrc: string;
   posterSrc?: string;
+  backgroundImageSrc?: string;
   headline: string;
   headlineAccent: string;
   eyebrow?: string;
   scrollPrompt?: string;
   children?: ReactNode;
-  onExpandComplete?: () => void;
 }
+
+const LERP_FACTOR = 0.1; // CSS animation damping (lower = smoother but slower)
+const MIN_DELTA = 0.0008; // stop RAF loop below this threshold
 
 const ScrollExpansionHero = memo(function ScrollExpansionHero({
   videoSrc,
   posterSrc,
+  backgroundImageSrc,
   headline,
   headlineAccent,
   eyebrow,
   scrollPrompt = 'Scroll to explore',
   children,
-  onExpandComplete,
 }: ScrollExpansionHeroProps) {
-  const [progress, setProgress] = useState(0);
+  const [displayProgress, setDisplayProgress] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const progressRef = useRef(0);
+  const targetRef = useRef(0);    // raw from user input — set immediately
+  const displayRef = useRef(0);   // lerped — drives CSS transitions
+  const isExpandedRef = useRef(false);
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  const syncVideoToProgress = useCallback((p: number) => {
-    const video = videoRef.current;
-    if (!video) return;
-    const duration = video.duration;
-    if (!duration || isNaN(duration)) return;
-    video.currentTime = p * duration;
+  // The animation loop: lerps displayRef toward targetRef each frame,
+  // updates React state (for CSS transitions), leaves video alone.
+  const runAnimationLoop = useCallback(() => {
+    const target = targetRef.current;
+    const current = displayRef.current;
+    const diff = target - current;
+
+    if (Math.abs(diff) < MIN_DELTA) {
+      displayRef.current = target;
+      setDisplayProgress(target);
+      // Trigger expand state when progress reaches 1
+      if (target >= 1 && !isExpandedRef.current) {
+        isExpandedRef.current = true;
+        setIsExpanded(true);
+        setTimeout(() => setContentVisible(true), 250);
+      }
+      return;
+    }
+
+    const next = current + diff * LERP_FACTOR;
+    displayRef.current = next;
+    setDisplayProgress(next);
+
+    rafRef.current = requestAnimationFrame(runAnimationLoop);
   }, []);
 
   const handleProgress = useCallback(
-    (p: number) => {
-      progressRef.current = p;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        setProgress(progressRef.current);
-        syncVideoToProgress(progressRef.current);
-      });
+    (rawProgress: number) => {
+      targetRef.current = rawProgress;
+
+      // Sync video to raw progress IMMEDIATELY (no lerp — prevents lag)
+      const video = videoRef.current;
+      if (video && video.duration && !isNaN(video.duration)) {
+        const targetTime = rawProgress * video.duration;
+        // Only seek if meaningfully different to avoid unnecessary decoding
+        if (Math.abs(video.currentTime - targetTime) > 0.016) {
+          video.currentTime = targetTime;
+        }
+      }
+
+      // Start the smooth CSS animation loop
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(runAnimationLoop);
     },
-    [syncVideoToProgress]
+    [runAnimationLoop]
   );
 
   const handleExpand = useCallback(() => {
+    isExpandedRef.current = true;
     setIsExpanded(true);
-    setTimeout(() => {
-      setContentVisible(true);
-      onExpandComplete?.();
-    }, 300);
-  }, [onExpandComplete]);
+    setTimeout(() => setContentVisible(true), 250);
+  }, []);
 
   const handleCollapse = useCallback(() => {
+    isExpandedRef.current = false;
     setIsExpanded(false);
     setContentVisible(false);
-    setProgress(1);
-    progressRef.current = 1;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      setProgress(0.99);
-      setTimeout(() => setProgress(0), 50);
-    });
-  }, []);
+    // Reset to just below 1 so collapse animation plays
+    targetRef.current = 0.98;
+    displayRef.current = 0.98;
+    setDisplayProgress(0.98);
+    // Then animate back to 0 smoothly
+    setTimeout(() => {
+      targetRef.current = 0;
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(runAnimationLoop);
+    }, 16);
+  }, [runAnimationLoop]);
 
   useScrollLock({
     onProgress: handleProgress,
@@ -98,128 +155,96 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
   });
 
   useEffect(() => {
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
+    return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
-  const ease = easeOutCubic(progress);
-  const easefast = easeOutCubic(Math.min(progress * 1.4, 1));
+  // Derived visual values from displayProgress (smooth)
+  const p = displayProgress;
+  const ease = easeOutCubic(p);
+  const easeDeep = easeOutCubic(Math.min(p * 1.3, 1));
 
-  const minW = isMobile ? 300 : 400;
-  const maxW = typeof window !== 'undefined' ? window.innerWidth : 1440;
-  const minH = isMobile ? 360 : 480;
-  const maxH = typeof window !== 'undefined' ? window.innerHeight : 900;
+  const viewW = typeof window !== 'undefined' ? window.innerWidth : 1440;
+  const viewH = typeof window !== 'undefined' ? window.innerHeight : 900;
+  const minW = isMobile ? 280 : 380;
+  const minH = isMobile ? 320 : 460;
 
-  const mediaWidth = lerp(minW, maxW, ease);
-  const mediaHeight = lerp(minH, maxH, ease);
-  const borderRadius = lerp(16, 0, easefast);
-  const overlayOpacity = lerp(0.55, 0, easeOutCubic(Math.min(progress * 1.2, 1)));
+  const mediaWidth = lerp(minW, viewW, ease);
+  const mediaHeight = lerp(minH, viewH, ease);
+  const borderRad = lerp(20, 0, easeDeep);
 
-  const textSplitX = progress * (isMobile ? 120 : 180);
-  const textOpacity = 1 - easeOutCubic(Math.min(progress * 2, 1));
+  // Text: fades to 0 by the time progress reaches ~0.45
+  const textOpacity = Math.max(0, 1 - p * 2.2);
+  const textScale = 1 - p * 0.04;
+
+  // Background: fades behind the expanding video
+  const bgOpacity = Math.max(0, 1 - ease * 1.6);
+
+  // Video overlay: starts subtle, disappears as video fills screen
+  const overlayOpacity = lerp(0.25, 0, easeOutCubic(Math.min(p * 1.4, 1)));
 
   return (
     <div className="relative overflow-x-hidden">
       <section
         className="relative flex flex-col items-center justify-start min-h-[100dvh]"
+        style={{ background: '#F7F6F4' }}
         aria-label="GrowTrades hero section"
       >
-        {/* Dark grid background that fades with progress */}
-        <motion.div
-          className="absolute inset-0 z-0 gt-grid-bg"
-          style={{
-            opacity: 1 - ease,
-            background: `
-              radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.18) 0%, transparent 70%),
-              #080810
-            `,
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)
-            `,
-            backgroundSize: '64px 64px',
-          }}
-        />
+        {/* ── LAYER 0: Background ────────────────────────────────── */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ opacity: bgOpacity }}
+          aria-hidden="true"
+        >
+          {backgroundImageSrc ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={backgroundImageSrc}
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ filter: `blur(${lerp(0, 12, ease)}px)` }}
+              />
+              {/* Lighten dark photos so dark text stays readable */}
+              <div className="absolute inset-0 bg-white/70" />
+            </>
+          ) : (
+            /* Clean grid on plain background */
+            <div
+              className="w-full h-full gt-grid-bg"
+              style={{
+                background: `
+                  radial-gradient(ellipse 70% 50% at 50% -5%, rgba(29,78,216,0.06) 0%, transparent 70%),
+                  #F7F6F4
+                `,
+              }}
+            />
+          )}
+        </div>
 
         <div className="relative flex flex-col items-center w-full min-h-[100dvh]">
-          {/* Eyebrow + headline text - splits apart on scroll */}
+          {/* ── LAYER 10: Video container ──────────────────────────── */}
           <div
-            className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none select-none"
-            style={{ opacity: textOpacity }}
-            aria-hidden={progress > 0.3}
-          >
-            {eyebrow && (
-              <motion.p
-                className="text-xs font-medium tracking-[0.2em] uppercase text-blue-400 mb-6"
-                style={{
-                  transform: `translateX(-${textSplitX * 0.4}vw)`,
-                  opacity: textOpacity,
-                }}
-              >
-                {eyebrow}
-              </motion.p>
-            )}
-
-            <div className="flex flex-col items-center gap-1 text-center px-4">
-              <span
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight"
-                style={{
-                  transform: `translateX(-${textSplitX}vw)`,
-                  opacity: textOpacity,
-                  display: 'block',
-                }}
-              >
-                {headline}
-              </span>
-              <span
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight"
-                style={{
-                  transform: `translateX(${textSplitX}vw)`,
-                  opacity: textOpacity,
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  display: 'block',
-                }}
-              >
-                {headlineAccent}
-              </span>
-            </div>
-
-            {/* Scroll indicator */}
-            <div
-              className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-              style={{ opacity: Math.max(0, 1 - progress * 4) }}
-            >
-              <span className="text-xs tracking-[0.15em] uppercase text-white/40 font-medium">
-                {scrollPrompt}
-              </span>
-              <div className="w-px h-8 bg-gradient-to-b from-white/20 to-transparent" />
-            </div>
-          </div>
-
-          {/* Video container — expands with scroll */}
-          <div
-            className="absolute top-1/2 left-1/2 z-20"
+            className="absolute top-1/2 left-1/2 z-10"
             style={{
               width: `${mediaWidth}px`,
               height: `${mediaHeight}px`,
               maxWidth: '100vw',
               maxHeight: '100dvh',
               transform: 'translate(-50%, -50%)',
-              borderRadius: `${borderRadius}px`,
+              borderRadius: `${borderRad}px`,
               overflow: 'hidden',
-              boxShadow: progress < 0.95
-                ? `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)`
-                : 'none',
+              willChange: 'width, height, border-radius',
+              boxShadow:
+                p < 0.9
+                  ? '0 24px 64px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05)'
+                  : 'none',
               transition: 'box-shadow 0.3s ease',
             }}
+            aria-label="GrowTrades brand video"
           >
-            {/* Skeleton while video loads */}
+            {/* Skeleton */}
             {!videoReady && (
-              <div className="absolute inset-0 bg-[#0d0d1c] animate-pulse" />
+              <div className="absolute inset-0 bg-stone-100 animate-pulse" aria-hidden="true" />
             )}
 
             <video
@@ -231,41 +256,81 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
               preload="auto"
               disablePictureInPicture
               className="w-full h-full object-cover"
-              style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.4s ease' }}
+              style={{
+                opacity: videoReady ? 1 : 0,
+                transition: 'opacity 0.4s ease',
+              }}
               onLoadedMetadata={() => setVideoReady(true)}
               onCanPlay={() => setVideoReady(true)}
-              aria-label="GrowTrades growth system demonstration"
             />
 
-            {/* Video overlay — fades out as video expands */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `linear-gradient(to bottom, rgba(8,8,16,${overlayOpacity * 0.5}) 0%, rgba(8,8,16,${overlayOpacity}) 100%)`,
-              }}
-            />
-
-            {/* Border glow at partial expansion */}
-            {progress < 0.95 && (
+            {/* Subtle overlay — thins as video expands */}
+            {overlayOpacity > 0.01 && (
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  borderRadius: `${borderRadius}px`,
-                  border: '1px solid rgba(59,130,246,0.2)',
+                  background: `rgba(247,246,244,${overlayOpacity})`,
                 }}
+                aria-hidden="true"
               />
+            )}
+          </div>
+
+          {/* ── LAYER 30: Text — ALWAYS above video ───────────────── */}
+          <div
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none select-none"
+            style={{
+              opacity: textOpacity,
+              transform: `scale(${textScale})`,
+              willChange: 'opacity, transform',
+            }}
+          >
+            {/* Eyebrow */}
+            {eyebrow && textOpacity > 0.01 && (
+              <p className="text-xs font-medium tracking-[0.2em] uppercase text-blue-700 mb-5">
+                {eyebrow}
+              </p>
+            )}
+
+            {/* Headline — split words fly apart on scroll */}
+            {textOpacity > 0.01 && (
+              <div className="flex flex-col items-center gap-0.5 text-center px-6">
+                <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111111] leading-tight tracking-tight">
+                  {headline}
+                </span>
+                <span
+                  className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight"
+                  style={{ color: '#1D4ED8' }}
+                >
+                  {headlineAccent}
+                </span>
+              </div>
+            )}
+
+            {/* Scroll cue */}
+            {textOpacity > 0.5 && (
+              <div
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+                style={{ opacity: Math.min(1, textOpacity * 2) }}
+                aria-label={scrollPrompt}
+              >
+                <span className="text-[11px] tracking-[0.18em] uppercase text-[#999] font-medium">
+                  {scrollPrompt}
+                </span>
+                <div className="w-px h-7 bg-gradient-to-b from-[#ccc] to-transparent" />
+              </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* Page content revealed after expansion */}
+      {/* ── Page content: fades in after video fully expands ─────── */}
       <AnimatePresence>
         {contentVisible && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             {children}
           </motion.div>

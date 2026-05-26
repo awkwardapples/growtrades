@@ -3,14 +3,17 @@
 import ScrollExpansionHero from '@/components/ui/scroll-expansion-hero';
 import { HERO_CONTENT } from '@/data/content';
 import { Button } from '@/components/ui/button';
-import { ArrowDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer, viewportConfig } from '@/lib/motion';
 
 function HeroPostContent() {
   return (
-    <section className="relative min-h-screen gt-glow-bg gt-grid-bg flex items-center justify-center px-4 py-32">
-      <div className="max-w-4xl mx-auto text-center">
+    <section
+      className="relative min-h-screen flex items-center justify-center px-4 py-32"
+      style={{ background: '#F7F6F4' }}
+    >
+      <div className="max-w-3xl mx-auto text-center">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -19,69 +22,56 @@ function HeroPostContent() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase text-blue-400"
+            className="text-xs font-medium tracking-[0.18em] uppercase"
+            style={{ color: '#1D4ED8' }}
           >
             {HERO_CONTENT.eyebrow}
           </motion.p>
 
           <motion.h1
             variants={fadeUp}
-            className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.05] tracking-tight"
+            className="text-5xl sm:text-6xl font-bold text-[#111] leading-[1.06] tracking-tight"
           >
             {HERO_CONTENT.headline}{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              {HERO_CONTENT.headlineAccent}
-            </span>
+            <span style={{ color: '#1D4ED8' }}>{HERO_CONTENT.headlineAccent}</span>
           </motion.h1>
 
           <motion.p
             variants={fadeUp}
-            className="text-lg md:text-xl text-white/55 leading-relaxed max-w-2xl"
+            className="text-lg text-[#666] leading-relaxed max-w-xl"
           >
             {HERO_CONTENT.subheadline}
           </motion.p>
 
           <motion.div
             variants={fadeUp}
-            className="flex flex-col sm:flex-row items-center gap-3 mt-2"
+            className="flex flex-col sm:flex-row items-center gap-3 mt-1"
           >
             <Button
               size="lg"
-              className="bg-blue-500 hover:bg-blue-400 text-white px-7 py-3 rounded-xl font-medium text-sm cursor-pointer transition-colors duration-150"
+              className="bg-[#1D4ED8] hover:bg-[#1e40af] text-white px-7 py-3 rounded-xl font-medium text-sm cursor-pointer transition-colors duration-150"
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
             >
               {HERO_CONTENT.cta}
-              <ArrowRight size={15} className="ml-2" />
+              <ArrowRight size={14} className="ml-2" aria-hidden="true" />
             </Button>
             <Button
               size="lg"
               variant="ghost"
-              className="text-white/60 hover:text-white hover:bg-white/5 px-7 py-3 rounded-xl font-medium text-sm cursor-pointer transition-colors duration-150"
+              className="text-[#555] hover:text-[#111] hover:bg-black/[0.04] px-7 py-3 rounded-xl font-medium text-sm cursor-pointer transition-colors duration-150"
+              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
             >
               {HERO_CONTENT.ctaSecondary}
-              <ArrowDown size={15} className="ml-2" />
             </Button>
           </motion.div>
 
-          {/* Trust signals */}
-          <motion.div
+          {/* Trust line */}
+          <motion.p
             variants={fadeUp}
-            className="flex flex-wrap items-center justify-center gap-6 mt-4 pt-8 border-t border-white/[0.07] w-full"
+            className="text-xs text-[#aaa] mt-2"
           >
-            {['Plumbers', 'Electricians', 'Builders', 'Roofers', 'Landscapers', 'Welders'].map(
-              (trade) => (
-                <span key={trade} className="text-xs text-white/30 font-medium">
-                  {trade}
-                </span>
-              )
-            )}
-          </motion.div>
+            Plumbers · Electricians · Builders · Roofers · Landscapers · Welders · Handymen
+          </motion.p>
         </motion.div>
       </div>
     </section>
@@ -93,6 +83,7 @@ export default function HeroSection() {
     <ScrollExpansionHero
       videoSrc={HERO_CONTENT.videoSrc}
       posterSrc={HERO_CONTENT.videoPoster}
+      backgroundImageSrc={HERO_CONTENT.heroBackgroundImage || undefined}
       headline={HERO_CONTENT.headline}
       headlineAccent={HERO_CONTENT.headlineAccent}
       eyebrow={HERO_CONTENT.eyebrow}

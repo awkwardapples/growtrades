@@ -5,28 +5,28 @@ import { WHY_US_POINTS } from '@/data/content';
 import { fadeUp, slideInLeft, slideInRight, staggerContainer, viewportConfig } from '@/lib/motion';
 
 const TRADITIONAL = [
-  'Generic marketing retainers',
-  'Sporadic lead quality',
-  'No system ownership',
-  'Vanity metrics reporting',
-  'Long fixed-term contracts',
-  'One-size-fits-all campaigns',
+  'Generic campaigns with no trade-specific knowledge',
+  'Inconsistent lead quality — no qualification layer',
+  'You own nothing when the contract ends',
+  'Vanity metrics: impressions, reach, "exposure"',
+  'Long fixed-term contracts with slow results',
+  'One-size-fits-all strategy',
 ];
 
 export default function WhyGrowTradesSection() {
   return (
     <section
       id="why-growtrades"
-      className="relative py-32 px-4 overflow-hidden"
+      className="relative py-32 px-4"
+      style={{ background: '#F7F6F4' }}
       aria-labelledby="why-heading"
-      style={{ background: '#080810' }}
     >
-      <div className="gt-accent-line max-w-6xl mx-auto mb-20 opacity-30" />
+      <div className="gt-divider max-w-6xl mx-auto mb-20" />
 
       <div className="max-w-6xl mx-auto">
-        {/* Section header */}
+        {/* Header */}
         <motion.div
-          className="mb-16 max-w-xl"
+          className="mb-14 max-w-lg"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -34,29 +34,29 @@ export default function WhyGrowTradesSection() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase text-blue-400 mb-4"
+            className="text-xs font-medium tracking-[0.18em] uppercase mb-4"
+            style={{ color: '#1D4ED8' }}
           >
             Why GrowTrades
           </motion.p>
           <motion.h2
             id="why-heading"
             variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tight mb-5"
+            className="text-4xl md:text-5xl font-bold text-[#111] leading-tight tracking-tight mb-4"
           >
-            Not another agency.{' '}
-            <span className="text-white/35">A growth partner.</span>
+            Not another marketing agency.
           </motion.h2>
           <motion.p
             variants={fadeUp}
-            className="text-base text-white/50 leading-relaxed"
+            className="text-base text-[#666] leading-relaxed"
           >
-            We&apos;re not here to sell you a campaign. We&apos;re here to build the systems that produce compounding growth — month after month.
+            We build and manage operational growth systems. The distinction matters.
           </motion.p>
         </motion.div>
 
-        {/* Comparison table */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-20">
-          {/* Traditional agencies */}
+        {/* Comparison */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-16">
+          {/* Traditional */}
           <motion.div
             variants={slideInLeft}
             initial="hidden"
@@ -64,24 +64,20 @@ export default function WhyGrowTradesSection() {
             viewport={viewportConfig}
             className="rounded-2xl p-6"
             style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: '#FFFFFF',
+              border: '1px solid rgba(0,0,0,0.07)',
             }}
           >
-            <p className="text-xs font-medium tracking-[0.15em] uppercase text-white/25 mb-5">
-              Traditional Agencies
+            <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#bbb] mb-5">
+              Typical marketing agencies
             </p>
             <ul className="space-y-3" role="list">
               {TRADITIONAL.map((item) => (
                 <li key={item} className="flex items-start gap-3">
-                  <div
-                    className="flex-shrink-0 mt-0.5 w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
-                    aria-hidden="true"
-                  >
-                    <span className="text-white/20 text-[10px]">✕</span>
-                  </div>
-                  <span className="text-sm text-white/35 leading-snug">{item}</span>
+                  <span className="flex-shrink-0 mt-0.5 text-[#ddd] text-sm leading-none" aria-hidden="true">
+                    ✕
+                  </span>
+                  <span className="text-sm text-[#aaa] leading-snug">{item}</span>
                 </li>
               ))}
             </ul>
@@ -95,11 +91,14 @@ export default function WhyGrowTradesSection() {
             viewport={viewportConfig}
             className="rounded-2xl p-6"
             style={{
-              background: 'rgba(59,130,246,0.05)',
-              border: '1px solid rgba(59,130,246,0.2)',
+              background: '#EEF2FF',
+              border: '1px solid rgba(29,78,216,0.15)',
             }}
           >
-            <p className="text-xs font-medium tracking-[0.15em] uppercase text-blue-400 mb-5">
+            <p
+              className="text-xs font-medium tracking-[0.15em] uppercase mb-5"
+              style={{ color: '#1D4ED8' }}
+            >
               GrowTrades
             </p>
             <ul className="space-y-3" role="list">
@@ -109,14 +108,12 @@ export default function WhyGrowTradesSection() {
                   <li key={point.title} className="flex items-start gap-3">
                     <div
                       className="flex-shrink-0 mt-0.5 w-4 h-4 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(59,130,246,0.15)' }}
+                      style={{ background: 'rgba(29,78,216,0.15)' }}
                       aria-hidden="true"
                     >
-                      <Icon size={9} className="text-blue-400" aria-hidden="true" />
+                      <Icon size={9} style={{ color: '#1D4ED8' }} aria-hidden="true" />
                     </div>
-                    <span className="text-sm text-white/65 leading-snug">
-                      {point.title}
-                    </span>
+                    <span className="text-sm text-[#333] leading-snug">{point.title}</span>
                   </li>
                 );
               })}
@@ -138,22 +135,22 @@ export default function WhyGrowTradesSection() {
               <motion.div
                 key={point.title}
                 variants={fadeUp}
-                className="flex gap-4 p-5 rounded-xl group gt-card-hover"
-                style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
+                className="gt-card flex gap-4 p-5 cursor-default"
               >
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                  <Icon size={14} className="text-blue-400" aria-hidden="true" />
+                <div
+                  className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
+                  style={{
+                    background: 'rgba(29,78,216,0.07)',
+                    border: '1px solid rgba(29,78,216,0.12)',
+                  }}
+                >
+                  <Icon size={14} style={{ color: '#1D4ED8' }} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white mb-1 leading-snug">
+                  <h3 className="text-sm font-semibold text-[#111] mb-1 leading-snug">
                     {point.title}
                   </h3>
-                  <p className="text-xs text-white/40 leading-relaxed">
-                    {point.description}
-                  </p>
+                  <p className="text-xs text-[#777] leading-relaxed">{point.description}</p>
                 </div>
               </motion.div>
             );

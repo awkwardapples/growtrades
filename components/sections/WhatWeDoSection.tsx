@@ -3,23 +3,21 @@
 import { motion } from 'framer-motion';
 import { SERVICES } from '@/data/content';
 import { fadeUp, staggerContainer, viewportConfig } from '@/lib/motion';
-import { Badge } from '@/components/ui/badge';
 
 export default function WhatWeDoSection() {
   return (
     <section
       id="what-we-do"
-      className="relative py-32 px-4 overflow-hidden"
-      style={{ background: '#080810' }}
+      className="relative py-32 px-4"
+      style={{ background: '#F7F6F4' }}
       aria-labelledby="what-we-do-heading"
     >
-      {/* Subtle separator line */}
-      <div className="gt-accent-line max-w-6xl mx-auto mb-20 opacity-40" />
+      <div className="gt-divider max-w-6xl mx-auto mb-20" />
 
       <div className="max-w-6xl mx-auto">
-        {/* Section header */}
+        {/* Header */}
         <motion.div
-          className="mb-16 max-w-xl"
+          className="mb-14 max-w-lg"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -27,27 +25,27 @@ export default function WhatWeDoSection() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase text-blue-400 mb-4"
+            className="text-xs font-medium tracking-[0.18em] uppercase mb-4"
+            style={{ color: '#1D4ED8' }}
           >
-            What We Do
+            What we do
           </motion.p>
           <motion.h2
             id="what-we-do-heading"
             variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold text-white leading-tight tracking-tight mb-5"
+            className="text-4xl md:text-5xl font-bold text-[#111] leading-tight tracking-tight mb-4"
           >
-            Six systems. One{' '}
-            <span className="text-white/40">growth engine.</span>
+            Six systems. One growth engine.
           </motion.h2>
           <motion.p
             variants={fadeUp}
-            className="text-base text-white/50 leading-relaxed"
+            className="text-base text-[#666] leading-relaxed"
           >
-            Every GrowTrades engagement deploys a set of compounding systems — each one feeding the next, building sustainable growth momentum over time.
+            Each system is built to compound on the last. More visibility leads to more leads. Better leads lead to better jobs.
           </motion.p>
         </motion.div>
 
-        {/* Bento grid */}
+        {/* Service grid */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           variants={staggerContainer}
@@ -55,50 +53,34 @@ export default function WhatWeDoSection() {
           whileInView="visible"
           viewport={viewportConfig}
         >
-          {SERVICES.map((service, i) => {
+          {SERVICES.map((service) => {
             const Icon = service.icon;
-            const isLarge = i === 0 || i === 3;
-
             return (
               <motion.div
                 key={service.title}
                 variants={fadeUp}
-                className={`relative group rounded-2xl p-6 gt-card-hover cursor-default ${
-                  isLarge ? 'lg:col-span-1' : ''
-                }`}
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                }}
+                className="gt-card p-6 group cursor-default"
               >
-                {/* Icon */}
-                <div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                  <Icon size={18} className="text-blue-400" aria-hidden="true" />
+                {/* Icon + tag row */}
+                <div className="flex items-start justify-between mb-4">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{
+                      background: 'rgba(29,78,216,0.07)',
+                      border: '1px solid rgba(29,78,216,0.12)',
+                    }}
+                  >
+                    <Icon size={16} style={{ color: '#1D4ED8' }} aria-hidden="true" />
+                  </div>
+                  <span className="gt-tag">{service.tag}</span>
                 </div>
 
-                {/* Tag */}
-                <Badge
-                  variant="outline"
-                  className="absolute top-5 right-5 text-[10px] font-medium tracking-wide text-white/30 border-white/10 bg-transparent px-2 py-0.5"
-                >
-                  {service.tag}
-                </Badge>
-
-                <h3 className="text-base font-semibold text-white mb-2 leading-snug">
+                <h3 className="text-sm font-semibold text-[#111] mb-2 leading-snug">
                   {service.title}
                 </h3>
-                <p className="text-sm text-white/45 leading-relaxed">
+                <p className="text-sm text-[#666] leading-relaxed">
                   {service.description}
                 </p>
-
-                {/* Hover glow */}
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"
-                  style={{
-                    background:
-                      'radial-gradient(ellipse at 30% 30%, rgba(59,130,246,0.06) 0%, transparent 70%)',
-                  }}
-                />
               </motion.div>
             );
           })}
