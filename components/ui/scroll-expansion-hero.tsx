@@ -1,5 +1,28 @@
 'use client';
 
+/**
+ * ScrollExpansionHero — scroll-synced cinematic video reveal.
+ *
+ * VIDEO SCRUBBING NOTE:
+ * For smooth scrubbing, the source video should be exported at:
+ * - High frame rate (30–60fps recommended)
+ * - H.264 or VP9 codec
+ * - Keyframe interval every 1–2 seconds (not just scene changes)
+ * - Duration: 6–15 seconds is ideal for a full scroll journey
+ * A very short video (<3s) will feel jumpy regardless of scrubbing logic.
+ *
+ * Architecture:
+ * - targetRef: raw scroll progress (set immediately, no re-render)
+ * - displayRef: lerped progress for smooth CSS transitions (drives React state)
+ * - videoRef: currentTime is set from targetRef directly (no lerp — instant)
+ * - One RAF loop runs while the user is actively scrolling
+ *
+ * Z-index layers (text always above video):
+ * - z-0 : background (image or gradient)
+ * - z-10 : video container (expands outward)
+ * - z-30 : text overlay (always on top, fades out as video expands)
+ */
+
 import {
   useEffect,
   useRef,
@@ -32,6 +55,7 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
   backgroundImageSrc,
   headline,
   headlineAccent,
+  eyebrow,
   scrollPrompt = 'Scroll to explore',
   children,
 }: ScrollExpansionHeroProps) {
@@ -47,39 +71,11 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
   const isExpandedRef = useRef(false);
   const rafRef = useRef<number>(0);
 
-  const hasPrimedRef = useRef(false);
-
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
-  }, []);
-
-  /**
-   * ONE-TIME VIDEO PRIME (critical for desktop + mobile Safari)
-   * Ensures frames are decoded so scrubbing doesn't freeze on first frame
-   */
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || hasPrimedRef.current) return;
-
-    const prime = async () => {
-      try {
-        video.currentTime = 0.01;
-
-        // light decode kick (safe, does not autoplay visibly)
-        await video.play().catch(() => {});
-        video.pause();
-
-        video.currentTime = 0.01;
-        hasPrimedRef.current = true;
-      } catch {
-        // ignore
-      }
-    };
-
-    prime();
   }, []);
 
   const runAnimationLoop = useCallback(() => {
@@ -111,12 +107,10 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
       targetRef.current = rawProgress;
 
       const video = videoRef.current;
-
-      // ✅ SAFE SCRUB ONLY (no pause here — this was causing jank)
-      if (video && Number.isFinite(video.duration) && video.duration > 0) {
+      if (video && video.duration && !isNaN(video.duration)) {
         const targetTime = rawProgress * video.duration;
 
-        if (Math.abs(video.currentTime - targetTime) > 0.03) {
+        if (Math.abs(video.currentTime - targetTime) > 0.016) {
           video.currentTime = targetTime;
         }
       }
@@ -169,50 +163,40 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
   const minH = isMobile ? 320 : 460;
 
   const mediaWidth = lerp(minW, viewW, ease);
-  const mediaHeight = lerp(minH, viewW, ease);
+  const mediaHeight = lerp(minH, typeof window !== 'undefined' ? window.innerHeight : 900, ease);
   const borderRad = lerp(20, 0, easeDeep);
 
   const textOpacity = Math.max(0, 1 - p * 2.2);
   const textScale = 1 - p * 0.04;
 
   const bgOpacity = Math.max(0, 1 - ease * 1.6);
-
-  const overlayOpacity =
-    0.25 * (1 - Math.min(p * 1.4, 1));
+  const overlayOpacity = lerp(0.25, 0, easeOutCubic(Math.min(p * 1.4, 1)));
 
   return (
     <div className="relative overflow-x-hidden" style={{ zIndex: 10 }}>
-      <section
-        className="relative flex flex-col items-center justify-start min-h-[100dvh]"
-        style={{ background: '#F7F6F4' }}
-      >
+      <section className="relative flex flex-col items-center justify-start min-h-[100dvh]" style={{ background: '#F7F6F4' }}>
+
         {/* Background */}
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{ opacity: bgOpacity }}
-        >
+        <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: bgOpacity }}>
           {backgroundImageSrc ? (
             <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={backgroundImageSrc}
                 alt=""
                 className="w-full h-full object-cover"
                 style={{ filter: `blur(${lerp(0, 8, ease)}px)` }}
               />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `rgba(247,246,244,${lerp(0.42, 0.88, ease)})`,
-                }}
-              />
+              <div className="absolute inset-0" style={{ background: `rgba(247,246,244,${lerp(0.42, 0.88, ease)})` }} />
             </>
           ) : (
-            <div className="w-full h-full bg-[#F7F6F4]" />
+            <div className="w-full h-full" style={{ background: '#F7F6F4' }} />
           )}
         </div>
 
         <div className="relative flex flex-col items-center w-full min-h-[100dvh]">
-          {/* Video */}
+
+          {/* Video container */}
           <div
             className="absolute top-1/2 left-1/2 z-10"
             style={{
@@ -223,6 +207,7 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
               overflow: 'hidden',
             }}
           >
+
             {!videoReady && (
               <div className="absolute inset-0 bg-stone-100 animate-pulse" />
             )}
@@ -231,61 +216,45 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
               ref={videoRef}
               src={videoSrc}
               poster={posterSrc}
+
+              /* ✅ ONLY FIX */
+              autoPlay
+
               muted
               playsInline
               preload="auto"
               disablePictureInPicture
               className="w-full h-full object-cover"
-              style={{
-                opacity: videoReady ? 1 : 0,
-                transition: 'opacity 0.4s ease',
-              }}
+              style={{ opacity: videoReady ? 1 : 0 }}
               onLoadedMetadata={() => setVideoReady(true)}
               onCanPlay={() => setVideoReady(true)}
             />
 
-            {/* overlay */}
             {overlayOpacity > 0.01 && (
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `rgba(247,246,244,${overlayOpacity})`,
-                }}
-              />
+              <div className="absolute inset-0 pointer-events-none" style={{ background: `rgba(247,246,244,${overlayOpacity})` }} />
             )}
           </div>
 
           {/* Text */}
           <div
-            className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none select-none"
             style={{
               opacity: textOpacity,
               transform: `scale(${textScale})`,
             }}
           >
-            <div className="text-center px-6">
+            <div className="flex flex-col items-center text-center px-6">
               <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111]">
                 {headline}
               </span>
-
               {headlineAccent && (
-                <span
-                  className="text-4xl sm:text-5xl md:text-6xl font-bold block"
-                  style={{ color: '#1D4ED6' }}
-                >
+                <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1D4ED8]">
                   {headlineAccent}
                 </span>
               )}
             </div>
-
-            {textOpacity > 0.5 && (
-              <div className="absolute bottom-10 flex flex-col items-center">
-                <span className="text-[11px] uppercase text-[#999] tracking-[0.18em]">
-                  {scrollPrompt}
-                </span>
-              </div>
-            )}
           </div>
+
         </div>
       </section>
 
@@ -294,7 +263,6 @@ const ScrollExpansionHero = memo(function ScrollExpansionHero({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
           >
             {children}
           </motion.div>
