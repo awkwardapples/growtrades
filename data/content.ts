@@ -15,7 +15,7 @@ import {
 
 export const HERO_CONTENT = {
   // Logo image displayed in Navbar. Place file at public/images/growtrades-logo.png.
-  companyLogo: '/images/growtrades-logo-transparent-background.png',
+  companyLogo: '/images/grow-trades-logo-transparent-background.png',
   eyebrow: '',
   headline: 'Grow your trades business',
   headlineAccent: '',
