@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/pricing-tool", "destination": "/pricing-tool.html" }
+  ]
+}

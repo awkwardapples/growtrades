@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing Calibration Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFAF6;
+    --paper-line:#E4E0D4;
+    --ink:#1C2530;
+    --ink-soft:#5B6472;
+    --amber:#D98C2B;
+    --amber-soft:#F5E3C6;
+    --teal:#3C5C58;
+    --teal-soft:#E1EBE9;
+    --danger:#B4482F;
+    --radius:10px;
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px;}
+  header.top{
+    border-bottom:1px solid var(--paper-line);
+    padding:28px 0 20px;
+    margin-bottom:8px;
+  }
+  header.top .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--amber);
+    font-weight:600;
+  }
+  header.top h1{
+    font-size:26px;
+    margin:6px 0 10px;
+    font-weight:700;
+  }
+  header.top p{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+    max-width:60ch;
+  }
+  .intro-box{
+    background:var(--teal-soft);
+    border:1px solid #C7D8D5;
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin:18px 0 24px;
+    font-size:14px;
+    color:#2A423F;
+  }
+  .intro-box strong{color:var(--teal);}
+  nav.tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:24px;
+    border-bottom:1px solid var(--paper-line);
+    padding-bottom:14px;
+  }
+  nav.tabs button{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:20px;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  nav.tabs button.active{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+  .service-blurb{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:var(--radius);
+    padding:20px 20px 8px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-size:15px;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .num{
+    font-family:'IBM Plex Mono',monospace;
+    background:var(--amber);
+    color:#fff;
+    font-size:11px;
+    width:20px;height:20px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .card .help{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 16px;
+  }
+  .field-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .field-row input[type="text"]{
+    flex:1 1 180px;
+    padding:8px 10px;
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    font-size:14px;
+    font-family:inherit;
+  }
+  .slider-block{margin-bottom:18px;}
+  .slider-block .slabel{
+    display:flex;
+    justify-content:space-between;
+    font-size:13.5px;
+    margin-bottom:6px;
+  }
+  .slider-block .slabel .live{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    color:var(--amber);
+  }
+  input[type="range"]{
+    width:100%;
+    accent-color:var(--amber);
+    height:6px;
+  }
+  input[type="number"]{
+    width:100px;
+    padding:7px 8px;
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+  }
+  select{
+    padding:7px 8px;
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    font-family:inherit;
+    font-size:14px;
+    background:#fff;
+  }
+  .minmax-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px;}
+  .minmax-row label{font-size:13px;display:block;margin-bottom:5px;color:var(--ink-soft);}
+  .checklist{list-style:none;padding:0;margin:0 0 16px;}
+  .checklist li{
+    font-size:14px;
+    padding:6px 0 6px 26px;
+    position:relative;
+  }
+  .checklist li::before{
+    content:"✓";
+    position:absolute;left:0;top:5px;
+    width:18px;height:18px;
+    background:var(--teal);
+    color:#fff;
+    border-radius:4px;
+    font-size:11px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .wizard-preview{
+    background:var(--ink);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:20px;
+  }
+  .wizard-preview .wp-title{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:14px;
+  }
+  .wp-steps{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .wp-chip{
+    font-size:12px;
+    padding:5px 10px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.18);
+  }
+  .wp-arrow{color:rgba(255,255,255,0.35);align-self:center;font-size:12px;}
+  .example{
+    background:rgba(255,255,255,0.06);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .example .ex-label{font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:4px;}
+  .example .ex-price{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:20px;
+    font-weight:600;
+    color:var(--amber);
+  }
+  .example .ex-detail{font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;}
+  .flag{
+    display:inline-block;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:10px;
+    margin-left:8px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .flag.clamped{background:var(--danger);color:#fff;}
+  .summary-box textarea{
+    width:100%;
+    min-height:180px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    padding:14px;
+    border-radius:8px;
+    border:1px solid var(--paper-line);
+    background:#F5F3EC;
+    resize:vertical;
+  }
+  .copy-btn{
+    margin-top:10px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .copy-btn:active{transform:translateY(1px);}
+  .copy-status{
+    font-size:12.5px;
+    color:var(--teal);
+    margin-left:10px;
+    font-weight:600;
+  }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Pricing calibration</div>
+    <h1>Set the prices your quote wizard shows customers</h1>
+    <p>For each service you offer, this sets the numbers your website uses to give an instant price estimate — before you've even seen the job.</p>
+  </header>
+
+  <div class="intro-box">
+    <strong>Why a range, and why wider than you'd normally quote:</strong>
+    a customer gets this estimate after answering just three quick questions online —
+    material, size/height, and length or area. You haven't seen photos or visited the
+    site. Real quotes always have more information behind them, so the online estimate
+    should show a <em>wider</em> range than you'd give after an in-person look — that
+    protects you from underquoting on a job that turns out trickier than it sounds, and
+    still gives the customer a genuinely useful ballpark. Move the sliders below until
+    the three example jobs look like numbers you'd be comfortable standing behind as a
+    "roughly this much" estimate — not your exact in-person price.
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+  <div id="panels"></div>
+
+  <div class="wrap" style="padding:0;">
+    <div class="card summary-box">
+      <h2><span class="num">✓</span>Copy your answers into the Google Form</h2>
+      <p class="help">This box updates live as you adjust the current service's sliders. Copy it into the matching pricing question on the client questionnaire.</p>
+      <textarea id="summaryOut" readonly></textarea>
+      <button class="copy-btn" id="copyBtn">Copy summary</button>
+      <span class="copy-status" id="copyStatus"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const RANGE_OPTIONS = [
+  {label:"No range — show a single price", width:0},
+  {label:"Up to £1,000 range", width:1000},
+  {label:"Up to £2,000 range", width:2000},
+  {label:"Up to £3,000 range", width:3000},
+];
+
+const SERVICES = [
+  {
+    id:"fencing", label:"Fencing", unit:"linear metre", qtyLabel:"metres",
+    blurb:"Customers pick a fence type, then a height, then enter the length in metres. Set your base price for the type they'll see first, then how much more or less each other type and height costs.",
+    hasMaterials:true, materialWord:"fence type",
+    attribute:{name:"Height", options:[
+      {label:"Low (up to 1.2m / 4ft)"},
+      {label:"Standard (1.5–1.8m / 5–6ft)", baseline:true},
+      {label:"Tall (over 1.8m / 6ft)"}
+    ]},
+    examples:[
+      {label:"Small garden, low fence", qty:10, materialSlot:0, attrIndex:0},
+      {label:"Typical back garden, standard fence", qty:20, materialSlot:1, attrIndex:1},
+      {label:"Large plot, tall fence", qty:35, materialSlot:2, attrIndex:2},
+    ]
+  },
+  {
+    id:"decking", label:"Decking", unit:"m²", qtyLabel:"m²",
+    blurb:"Customers pick a decking material, then enter the deck's area in m².",
+    hasMaterials:true, materialWord:"decking material",
+    examples:[
+      {label:"Small balcony deck", qty:8, materialSlot:0},
+      {label:"Typical garden deck", qty:20, materialSlot:1},
+      {label:"Large entertaining deck", qty:40, materialSlot:2},
+    ]
+  },
+  {
+    id:"patio", label:"Patio & Paving", unit:"m²", qtyLabel:"m²",
+    blurb:"Customers pick a paving material, an optional edging style, then enter the area in m².",
+    hasMaterials:true, materialWord:"paving material",
+    hasEdging:true, edgingOptions:[
+      {label:"None", baseline:true},
+      {label:"Block edging"},
+      {label:"Kerb edging"},
+    ],
+    examples:[
+      {label:"Small patio, no edging", qty:12, materialSlot:0, edgingIndex:0},
+      {label:"Typical patio, block edging", qty:25, materialSlot:1, edgingIndex:1},
+      {label:"Large patio, kerb edging", qty:45, materialSlot:2, edgingIndex:2},
+    ]
+  },
+  {
+    id:"driveway", label:"Driveway", unit:"m²", qtyLabel:"m²",
+    blurb:"Customers pick a driveway material, then enter the area in m².",
+    hasMaterials:true, materialWord:"driveway material",
+    examples:[
+      {label:"Small single driveway", qty:20, materialSlot:0},
+      {label:"Typical driveway", qty:45, materialSlot:1},
+      {label:"Large double driveway", qty:70, materialSlot:2},
+    ]
+  },
+  {
+    id:"gardensteps", label:"Garden Steps", unit:"step", qtyLabel:"steps",
+    blurb:"Customers pick a shape, a material, then enter the number of steps.",
+    hasMaterials:true, materialWord:"step material",
+    attribute:{name:"Shape", options:[
+      {label:"Straight", baseline:true},
+      {label:"Curved / semi-circular"}
+    ]},
+    examples:[
+      {label:"Small straight steps", qty:3, materialSlot:0, attrIndex:0},
+      {label:"Typical straight steps", qty:5, materialSlot:1, attrIndex:0},
+      {label:"Curved feature steps", qty:8, materialSlot:2, attrIndex:1},
+    ]
+  },
+  {
+    id:"painting", label:"Painting & Decorating", unit:"room", qtyLabel:"rooms",
+    blurb:"There's no material choice here — customers just enter how many rooms. Assume every room includes everything below, at one flat price.",
+    hasRoomScope:true,
+    roomScopeItems:["Walls","Ceilings","Skirting boards","Doors","Window frames"],
+    // Painting jobs are priced per room at a much smaller scale than the
+    // other services (tens/hundreds of pounds, not thousands), so a
+    // £1,000+ range would swamp the actual price. Smaller, room-scale
+    // range options instead.
+    rangeOptions:[
+      {label:"No range — show a single price", width:0},
+      {label:"Up to £50 range", width:50},
+      {label:"Up to £100 range", width:100},
+      {label:"Up to £200 range", width:200},
+      {label:"Up to £300 range", width:300},
+      {label:"Up to £400 range", width:400},
+    ],
+    examples:[
+      {label:"Small job", qty:1},
+      {label:"Typical job", qty:3},
+      {label:"Larger job", qty:5},
+    ]
+  },
+  {
+    id:"pressurewashing", label:"Pressure Washing", unit:"m²", qtyLabel:"m²",
+    blurb:"Customers pick the surface being cleaned, then enter the area in m².",
+    hasMaterials:true, materialWord:"surface type",
+    examples:[
+      {label:"Small patio wash", qty:15, materialSlot:0},
+      {label:"Driveway wash", qty:35, materialSlot:1},
+      {label:"Large mixed area", qty:60, materialSlot:2},
+    ]
+  },
+];
+
+const state = {};
+SERVICES.forEach(svc=>{
+  state[svc.id] = {
+    materials: svc.hasMaterials ? [
+      {name:"", price:50},
+      {name:"", premium:20},
+      {name:"", premium:40},
+      {name:"", premium:0, enabled:false},
+    ] : null,
+    attribute: svc.attribute ? svc.attribute.options.map(o=>({premium:0})) : null,
+    edging: svc.hasEdging ? svc.edgingOptions.map(o=>({price:0})) : null,
+    roomPrice: svc.hasRoomScope ? 180 : null,
+    minPrice: 50,
+    maxPrice: 8000,
+    rangeIdx: 1,
+  };
+});
+
+let current = SERVICES[0].id;
+
+function fmt(n){ return "£" + Math.round(n).toLocaleString("en-GB"); }
+
+function materialUnitPrice(svc, s, slotIdx){
+  const base = s.materials[0].price;
+  if(slotIdx===0) return base;
+  const prem = s.materials[slotIdx].premium || 0;
+  return base * (1 + prem/100);
+}
+
+function computeExample(svc, ex){
+  const s = state[svc.id];
+  let unitPrice;
+  if(svc.hasRoomScope){
+    unitPrice = s.roomPrice;
+  } else {
+    unitPrice = materialUnitPrice(svc, s, ex.materialSlot);
+    if(svc.attribute && ex.attrIndex!==undefined){
+      const prem = s.attribute[ex.attrIndex].premium || 0;
+      unitPrice = unitPrice * (1 + prem/100);
+    }
+    if(svc.hasEdging && ex.edgingIndex!==undefined){
+      unitPrice += (s.edging[ex.edgingIndex].price||0) / ex.qty;
+    }
+  }
+  let total = unitPrice * ex.qty;
+  let clamped = false;
+  if(total < s.minPrice){ total = s.minPrice; clamped = true; }
+  if(total > s.maxPrice){ return {overCap:true}; }
+  const rangeOpts = svc.rangeOptions || RANGE_OPTIONS;
+  const width = rangeOpts[s.rangeIdx].width;
+  const low = Math.max(0, total - width/2);
+  const high = total + width/2;
+  return {low, high, total, clamped};
+}
+
+function renderTabs(){
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = "";
+  SERVICES.forEach(svc=>{
+    const b = document.createElement("button");
+    b.textContent = svc.label;
+    b.className = svc.id===current ? "active" : "";
+    b.onclick = ()=>{ current = svc.id; renderAll(); };
+    tabs.appendChild(b);
+  });
+}
+
+function slider(labelHtml, value, min, max, step, onInput, liveFormatter){
+  const wrap = document.createElement("div");
+  wrap.className = "slider-block";
+  const lab = document.createElement("div");
+  lab.className = "slabel";
+  const left = document.createElement("span");
+  left.innerHTML = labelHtml;
+  const live = document.createElement("span");
+  live.className = "live";
+  live.textContent = liveFormatter(value);
+  lab.appendChild(left); lab.appendChild(live);
+  const input = document.createElement("input");
+  input.type = "range"; input.min=min; input.max=max; input.step=step; input.value=value;
+  input.oninput = ()=>{
+    const v = parseFloat(input.value);
+    live.textContent = liveFormatter(v);
+    onInput(v);
+    renderExamples();
+    renderSummary();
+  };
+  wrap.appendChild(lab); wrap.appendChild(input);
+  return wrap;
+}
+
+function renderPanel(svc){
+  const s = state[svc.id];
+  const panel = document.createElement("section");
+  panel.className = "panel active";
+  panel.id = "panel-"+svc.id;
+
+  const blurb = document.createElement("p");
+  blurb.className = "service-blurb";
+  blurb.textContent = svc.blurb;
+  panel.appendChild(blurb);
+
+  // ---- Materials card ----
+  if(svc.hasMaterials){
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h2><span class="num">1</span>${svc.materialWord[0].toUpperCase()+svc.materialWord.slice(1)}s you offer</h2>
+      <p class="help">List up to 4. The first is your baseline — every other price is set relative to it, so get that one right first.</p>`;
+
+    s.materials.forEach((m, i)=>{
+      const row = document.createElement("div");
+      row.className = "field-row";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = i===0 ? "Baseline "+svc.materialWord+" (e.g. Softwood)" : svc.materialWord+" "+(i+1)+" (leave blank if not offered)";
+      input.value = m.name;
+      input.oninput = ()=>{ m.name = input.value; renderExamples(); renderSummary(); };
+      row.appendChild(input);
+      card.appendChild(row);
+
+      if(i===0){
+        card.appendChild(slider(
+          `Base price per ${svc.unit}`, m.price, 5, 500, 1,
+          v=>{ m.price = v; },
+          v=>fmt(v)
+        ));
+      } else {
+        card.appendChild(slider(
+          `Price vs. baseline`, m.premium, -50, 100, 5,
+          v=>{ m.premium = v; },
+          v=>{
+            const base = s.materials[0].price;
+            const val = base*(1+v/100);
+            const sign = v>=0?"+":"";
+            return sign+v+"% → "+fmt(val)+"/"+svc.unit;
+          }
+        ));
+      }
+    });
+    panel.appendChild(card);
+  }
+
+  // ---- Attribute card (Height / Shape) ----
+  if(svc.attribute){
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h2><span class="num">2</span>${svc.attribute.name} pricing</h2>
+      <p class="help">These are fixed options customers pick from — set how much more or less each one costs vs. the baseline.</p>`;
+    svc.attribute.options.forEach((opt, i)=>{
+      if(opt.baseline){
+        const p = document.createElement("p");
+        p.className = "help";
+        p.innerHTML = `<strong>${opt.label}</strong> — baseline, no adjustment (0%)`;
+        card.appendChild(p);
+      } else {
+        card.appendChild(slider(
+          opt.label, s.attribute[i].premium, -50, 100, 5,
+          v=>{ s.attribute[i].premium = v; },
+          v=>{ const sign=v>=0?"+":""; return sign+v+"%"; }
+        ));
+      }
+    });
+    panel.appendChild(card);
+  }
+
+  // ---- Edging card (Patio only) ----
+  if(svc.hasEdging){
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h2><span class="num">3</span>Edging</h2>
+      <p class="help">Flat add-on price for each edging option, regardless of job size.</p>`;
+    svc.edgingOptions.forEach((opt, i)=>{
+      if(opt.baseline){
+        const p = document.createElement("p");
+        p.className = "help";
+        p.innerHTML = `<strong>${opt.label}</strong> — £0, already assumed`;
+        card.appendChild(p);
+      } else {
+        card.appendChild(slider(
+          opt.label+" — flat price", s.edging[i].price, 0, 1000, 10,
+          v=>{ s.edging[i].price = v; },
+          v=>fmt(v)
+        ));
+      }
+    });
+    panel.appendChild(card);
+  }
+
+  // ---- Room scope card (Painting only) ----
+  if(svc.hasRoomScope){
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h2><span class="num">1</span>What's included per room</h2>
+      <p class="help">Assume every room quoted through the wizard includes all of the below, at one flat price — there's no way for the customer to select individual items.</p>`;
+    const ul = document.createElement("ul");
+    ul.className = "checklist";
+    svc.roomScopeItems.forEach(it=>{
+      const li = document.createElement("li");
+      li.textContent = it;
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    card.appendChild(slider(
+      "Price per room (average size, all items above included)", s.roomPrice, 30, 800, 5,
+      v=>{ s.roomPrice = v; },
+      v=>fmt(v)
+    ));
+    panel.appendChild(card);
+  }
+
+  // ---- Min / Max / Range card ----
+  const boundsCard = document.createElement("div");
+  boundsCard.className = "card";
+  boundsCard.innerHTML = `<h2><span class="num">✓</span>Limits &amp; range</h2>
+    <p class="help">These apply to every example below, so you can see exactly what effect they have.</p>`;
+  const mm = document.createElement("div");
+  mm.className = "minmax-row";
+  mm.innerHTML = `
+    <div><label>Minimum job price</label></div>
+    <div><label>Above this, show "contact us" instead of a number</label></div>
+  `;
+  const minInput = document.createElement("input");
+  minInput.type="number"; minInput.value=s.minPrice;
+  minInput.oninput = ()=>{ s.minPrice = parseFloat(minInput.value)||0; renderExamples(); renderSummary(); };
+  const maxInput = document.createElement("input");
+  maxInput.type="number"; maxInput.value=s.maxPrice;
+  maxInput.oninput = ()=>{ s.maxPrice = parseFloat(maxInput.value)||0; renderExamples(); renderSummary(); };
+  mm.children[0].appendChild(minInput);
+  mm.children[1].appendChild(maxInput);
+  boundsCard.appendChild(mm);
+
+  const rangeWrap = document.createElement("div");
+  rangeWrap.style.marginBottom = "12px";
+  const rangeLabel = document.createElement("label");
+  rangeLabel.style.fontSize="13px"; rangeLabel.style.color="var(--ink-soft)"; rangeLabel.style.display="block"; rangeLabel.style.marginBottom="5px";
+  rangeLabel.innerHTML = `The estimate is shown as a range, e.g. "£1,250 – £2,100". How wide should that range be?`;
+  const sel = document.createElement("select");
+  const rangeOpts = svc.rangeOptions || RANGE_OPTIONS;
+  rangeOpts.forEach((r,i)=>{
+    const o = document.createElement("option");
+    o.value=i; o.textContent=r.label;
+    sel.appendChild(o);
+  });
+  sel.value = s.rangeIdx;
+  sel.onchange = ()=>{ s.rangeIdx = parseInt(sel.value); renderExamples(); renderSummary(); };
+  rangeWrap.appendChild(rangeLabel);
+  rangeWrap.appendChild(sel);
+  boundsCard.appendChild(rangeWrap);
+  panel.appendChild(boundsCard);
+
+  // ---- Live example preview ----
+  const preview = document.createElement("div");
+  preview.className = "wizard-preview";
+  preview.id = "preview-"+svc.id;
+  panel.appendChild(preview);
+
+  return panel;
+}
+
+function renderExamples(){
+  const svc = SERVICES.find(x=>x.id===current);
+  const preview = document.getElementById("preview-"+svc.id);
+  if(!preview) return;
+  let stepsHtml = `<div class="wp-steps">`;
+  if(svc.hasMaterials) stepsHtml += `<span class="wp-chip">${svc.materialWord}</span><span class="wp-arrow">→</span>`;
+  if(svc.attribute) stepsHtml += `<span class="wp-chip">${svc.attribute.name}</span><span class="wp-arrow">→</span>`;
+  if(svc.hasEdging) stepsHtml += `<span class="wp-chip">Edging</span><span class="wp-arrow">→</span>`;
+  stepsHtml += `<span class="wp-chip">${svc.qtyLabel}</span></div>`;
+
+  let html = `<div class="wp-title">Live preview — 3 example jobs</div>${stepsHtml}`;
+  svc.examples.forEach(ex=>{
+    const r = computeExample(svc, ex);
+    html += `<div class="example"><div class="ex-label">${ex.label} — ${ex.qty} ${svc.qtyLabel}</div>`;
+    if(r.overCap){
+      html += `<div class="ex-price">Contact us<span class="flag clamped">OVER CAP</span></div>
+        <div class="ex-detail">This job would exceed your maximum job price — the wizard will ask the customer to contact you directly instead of showing a number.</div>`;
+    } else {
+      const rangeTxt = r.low===r.high ? fmt(r.total) : (fmt(r.low)+" – "+fmt(r.high));
+      html += `<div class="ex-price">${rangeTxt} ${r.clamped ? '<span class="flag clamped">MIN APPLIED</span>':''}</div>
+        <div class="ex-detail">${r.clamped ? "Raised to your minimum job price." : "Calculated from your sliders above."}</div>`;
+    }
+    html += `</div>`;
+  });
+  preview.innerHTML = html;
+}
+
+function renderSummary(){
+  const svc = SERVICES.find(x=>x.id===current);
+  const s = state[svc.id];
+  let lines = [`${svc.label} — pricing summary`, ""];
+
+  if(svc.hasMaterials){
+    lines.push("Materials:");
+    s.materials.forEach((m,i)=>{
+      if(!m.name) return;
+      if(i===0){ lines.push(`  - ${m.name} (baseline): ${fmt(m.price)} per ${svc.unit}`); }
+      else {
+        const val = m.price !== undefined ? m.price : s.materials[0].price*(1+m.premium/100);
+        const val2 = s.materials[0].price*(1+m.premium/100);
+        lines.push(`  - ${m.name}: ${m.premium>=0?"+":""}${m.premium}% vs baseline = ${fmt(val2)} per ${svc.unit}`);
+      }
+    });
+  }
+  if(svc.attribute){
+    lines.push(`${svc.attribute.name}:`);
+    svc.attribute.options.forEach((opt,i)=>{
+      if(opt.baseline){ lines.push(`  - ${opt.label}: baseline, no adjustment`); }
+      else { lines.push(`  - ${opt.label}: ${s.attribute[i].premium>=0?"+":""}${s.attribute[i].premium}%`); }
+    });
+  }
+  if(svc.hasEdging){
+    lines.push("Edging:");
+    svc.edgingOptions.forEach((opt,i)=>{
+      if(opt.baseline){ lines.push(`  - ${opt.label}: £0`); }
+      else { lines.push(`  - ${opt.label}: ${fmt(s.edging[i].price)} flat`); }
+    });
+  }
+  if(svc.hasRoomScope){
+    lines.push(`Includes per room: ${svc.roomScopeItems.join(", ")}`);
+    lines.push(`Price per room: ${fmt(s.roomPrice)}`);
+  }
+  lines.push("");
+  lines.push(`Minimum job price: ${fmt(s.minPrice)}`);
+  lines.push(`Maximum job price (cap): ${fmt(s.maxPrice)}`);
+  lines.push(`Estimate range width: ${(svc.rangeOptions || RANGE_OPTIONS)[s.rangeIdx].label}`);
+  lines.push("");
+  lines.push("Example jobs (for reference):");
+  svc.examples.forEach(ex=>{
+    const r = computeExample(svc, ex);
+    const txt = r.overCap ? "Contact us (over cap)" : (r.low===r.high ? fmt(r.total) : fmt(r.low)+" – "+fmt(r.high));
+    lines.push(`  - ${ex.label} (${ex.qty} ${svc.qtyLabel}): ${txt}`);
+  });
+
+  document.getElementById("summaryOut").value = lines.join("\n");
+}
+
+function renderAll(){
+  renderTabs();
+  const panels = document.getElementById("panels");
+  panels.innerHTML = "";
+  const svc = SERVICES.find(x=>x.id===current);
+  panels.appendChild(renderPanel(svc));
+  renderExamples();
+  renderSummary();
+}
+
+document.getElementById("copyBtn").onclick = ()=>{
+  const ta = document.getElementById("summaryOut");
+  ta.select();
+  document.execCommand("copy");
+  const status = document.getElementById("copyStatus");
+  status.textContent = "Copied ✓";
+  setTimeout(()=>status.textContent="", 2000);
+};
+
+renderAll();
+</script>
+</body>
+</html>
